@@ -12,7 +12,7 @@ class Desktop {
         public readonly kwinDesktop: KwinDesktop,
         private readonly pinManager: PinManager,
         private readonly config: Desktop.Config,
-        private readonly getScreen: () => Output,
+        public readonly screen: Output,
         layoutConfig: LayoutConfig,
         focusPasser: FocusPassing.Passer,
     ) {
@@ -22,12 +22,12 @@ class Desktop {
         this.dirtyScroll = true;
         this.dirtyPins = true;
         this.grid = new Grid(this, layoutConfig, focusPasser);
-        this.clientArea = Desktop.getClientArea(this.getScreen(), kwinDesktop);
+        this.clientArea = Desktop.getClientArea(this.screen, kwinDesktop);
         this.tilingArea = Desktop.getTilingArea(this.clientArea, kwinDesktop, pinManager, config);
     }
 
     private updateArea() {
-        const newClientArea = Desktop.getClientArea(this.getScreen(), this.kwinDesktop);
+        const newClientArea = Desktop.getClientArea(this.screen, this.kwinDesktop);
         if (rectEquals(newClientArea, this.clientArea) && !this.dirtyPins) {
             return;
         }
