@@ -19,6 +19,7 @@ function initWorkspaceSignalHandlers(world: World, focusPasser: FocusPassing.Pas
         } else {
             focusPasser.clearIfDifferent(kwinClient);
             world.do((clientManager, desktopManager) => {
+                desktopManager.selectScreen(kwinClient.output);
                 clientManager.onClientFocused(kwinClient);
             });
         }

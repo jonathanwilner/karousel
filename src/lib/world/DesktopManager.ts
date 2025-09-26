@@ -1,5 +1,5 @@
 class DesktopManager {
-    private readonly desktops: Map<string, Desktop>; // key is activityId|desktopId
+    private readonly desktops: Map<string, DesktopManager.ActivityDesktop>; // key is activityId|desktopId
     private selectedScreen: Output;
     private kwinActivities: Set<string>;
     private kwinDesktops: Set<KwinDesktop>;
@@ -20,40 +20,34 @@ class DesktopManager {
         this.kwinActivities = new Set(Workspace.activities);
         this.kwinDesktops = new Set(Workspace.desktops);
         this.addDesktop(currentActivity, currentDesktop);
+        this.getDesktop(currentActivity, currentDesktop, this.selectedScreen);
     }
 
-    public getDesktop(activity: string, kwinDesktop: KwinDesktop) {
-        const desktopKey = DesktopManager.getDesktopKey(activity, kwinDesktop);
-        const desktop = this.desktops.get(desktopKey);
-        if (desktop !== undefined) {
-            return desktop;
-        } else {
-            return this.addDesktop(activity, kwinDesktop);
-        }
+    public getDesktop(activity: string, kwinDesktop: KwinDesktop, screen: Output) {
+        return this.getOrCreateActivityDesktop(activity, kwinDesktop).getDesktop(screen);
     }
 
     public getCurrentDesktop() {
-        return this.getDesktop(Workspace.currentActivity, Workspace.currentDesktop);
+        return this.getDesktop(Workspace.currentActivity, Workspace.currentDesktop, this.selectedScreen);
     }
 
-    public getDesktopInCurrentActivity(kwinDesktop: KwinDesktop) {
-        return this.getDesktop(Workspace.currentActivity, kwinDesktop);
+    public getDesktopInCurrentActivity(kwinDesktop: KwinDesktop, screen: Output) {
+        return this.getDesktop(Workspace.currentActivity, kwinDesktop, screen);
     }
 
     public getDesktopForClient(kwinClient: KwinClient) {
         if (kwinClient.activities.length !== 1 || kwinClient.desktops.length !== 1) {
             return undefined;
         }
-        return this.getDesktop(kwinClient.activities[0], kwinClient.desktops[0]);
+        return this.getDesktop(kwinClient.activities[0], kwinClient.desktops[0], kwinClient.output);
     }
 
     private addDesktop(activity: string, kwinDesktop: KwinDesktop) {
         const desktopKey = DesktopManager.getDesktopKey(activity, kwinDesktop);
-        const desktop = new Desktop(
+        const desktop = new DesktopManager.ActivityDesktop(
             kwinDesktop,
             this.pinManager,
             this.config,
-            () => this.selectedScreen,
             this.layoutConfig,
             this.focusPasser,
         );
@@ -87,6 +81,7 @@ class DesktopManager {
 
     public selectScreen(screen: Output) {
         this.selectedScreen = screen;
+        this.getDesktop(Workspace.currentActivity, Workspace.currentDesktop, screen);
     }
 
     private removeActivity(activity: string) {
@@ -118,7 +113,7 @@ class DesktopManager {
 
     public *getAllDesktops() {
         for (const desktop of this.desktops.values()) {
-            yield desktop;
+            yield* desktop.getAllDesktops();
         }
     }
 
@@ -136,8 +131,62 @@ class DesktopManager {
                 const desktopKey = DesktopManager.getDesktopKey(matchedActivity, matchedDesktop);
                 const desktop = this.desktops.get(desktopKey);
                 if (desktop !== undefined) {
-                    yield desktop;
+                    yield* desktop.getAllDesktops();
                 }
+            }
+        }
+    }
+
+    private getOrCreateActivityDesktop(activity: string, kwinDesktop: KwinDesktop) {
+        const desktopKey = DesktopManager.getDesktopKey(activity, kwinDesktop);
+        let desktop = this.desktops.get(desktopKey);
+        if (desktop === undefined) {
+            desktop = this.addDesktop(activity, kwinDesktop);
+        }
+        return desktop;
+    }
+}
+
+namespace DesktopManager {
+    export class ActivityDesktop {
+        private readonly desktops: Map<Output, Desktop>;
+
+        constructor(
+            private readonly kwinDesktop: KwinDesktop,
+            private readonly pinManager: PinManager,
+            private readonly config: Desktop.Config,
+            private readonly layoutConfig: LayoutConfig,
+            private readonly focusPasser: FocusPassing.Passer,
+        ) {
+            this.desktops = new Map();
+        }
+
+        public getDesktop(screen: Output) {
+            let desktop = this.desktops.get(screen);
+            if (desktop === undefined) {
+                desktop = new Desktop(
+                    this.kwinDesktop,
+                    this.pinManager,
+                    this.config,
+                    screen,
+                    this.layoutConfig,
+                    this.focusPasser,
+                );
+                this.desktops.set(screen, desktop);
+            }
+            return desktop;
+        }
+
+        public destroy() {
+            for (const desktop of this.desktops.values()) {
+                desktop.destroy();
+            }
+            this.desktops.clear();
+        }
+
+        public *getAllDesktops() {
+            for (const desktop of this.desktops.values()) {
+                yield desktop;
             }
         }
     }

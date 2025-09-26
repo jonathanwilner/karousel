@@ -10,7 +10,7 @@ class MockKwinClient {
     public resize = false;
     public readonly fullScreenable: boolean = true;
     public readonly maximizable: boolean = true;
-    public readonly output: Output = { __brand: "Output" };
+    public output: Output;
     public resourceClass = "app";
     public readonly dock: boolean = false;
     public readonly normalWindow: boolean = true;
@@ -48,10 +48,12 @@ class MockKwinClient {
     constructor(
         private _frameGeometry: MockQmlRect = new MockQmlRect(10, 10, 100, 200),
         public readonly transientFor: MockKwinClient|null = null,
+        options: { output?: Output } = {},
     ) {
         this.windowedFrameGeometry = _frameGeometry.clone();
         this.transient = transientFor !== null;
         this._desktops = [Workspace.currentDesktop];
+        this.output = options.output ?? Workspace.activeScreen;
     }
 
     setMaximize(vertically: boolean, horizontally: boolean) {

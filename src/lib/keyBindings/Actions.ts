@@ -197,7 +197,7 @@ class Actions {
     public readonly columnsWidthEqualize = (cm: ClientManager, dm: DesktopManager) => {
         const desktop = dm.getCurrentDesktop();
         const visibleRange = desktop.getCurrentVisibleRange();
-        const visibleColumns = Array.from(desktop.grid.getVisibleColumns(visibleRange, true));
+        const visibleColumns: Column[] = Array.from(desktop.grid.getVisibleColumns(visibleRange, true));
 
         const availableSpace = desktop.tilingArea.width;
         const gapsWidth = desktop.grid.config.gapsInnerHorizontal * (visibleColumns.length-1);
@@ -219,7 +219,7 @@ class Actions {
             return;
         }
 
-        const currentVisibleColumns = Array.from(grid.getVisibleColumns(visibleRange, true));
+        const currentVisibleColumns: Column[] = Array.from(grid.getVisibleColumns(visibleRange, true));
         console.assert(currentVisibleColumns.includes(focusedColumn), "should at least contain the focused column");
 
         const targetColumn = grid.getLeftColumn(currentVisibleColumns[0]);
@@ -246,7 +246,7 @@ class Actions {
             return;
         }
 
-        const currentVisibleColumns = Array.from(grid.getVisibleColumns(visibleRange, true));
+        const currentVisibleColumns: Column[] = Array.from(grid.getVisibleColumns(visibleRange, true));
         console.assert(currentVisibleColumns.includes(focusedColumn), "should at least contain the focused column");
 
         const targetColumn = grid.getRightColumn(currentVisibleColumns[currentVisibleColumns.length-1]);
@@ -396,7 +396,7 @@ class Actions {
         if (kwinDesktop === undefined) {
             return;
         }
-        const newGrid = dm.getDesktopInCurrentActivity(kwinDesktop).grid;
+        const newGrid = dm.getDesktopInCurrentActivity(kwinDesktop, oldGrid.desktop.screen).grid;
         if (newGrid === null || newGrid === oldGrid) {
             return;
         }
@@ -408,7 +408,7 @@ class Actions {
         if (kwinDesktop === undefined) {
             return;
         }
-        const newGrid = dm.getDesktopInCurrentActivity(kwinDesktop).grid;
+        const newGrid = dm.getDesktopInCurrentActivity(kwinDesktop, oldGrid.desktop.screen).grid;
         if (newGrid === null || newGrid === oldGrid) {
             return;
         }

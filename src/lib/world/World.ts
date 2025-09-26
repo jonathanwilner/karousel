@@ -98,7 +98,9 @@ class World {
     }
 
     private update() {
-        this.desktopManager.getCurrentDesktop().arrange();
+        for (const desktop of this.desktopManager.getAllDesktops()) {
+            desktop.arrange();
+        }
         this.moveCursorToFocus();
     }
 
