@@ -135,9 +135,11 @@ class Grid {
         }
     }
 
-    public arrange(x: number, visibleRange: Range) {
+    public arrange(x: number, visibleRange: Range, arrangeRange: Range|null) {
         for (const column of this.columns.iterator()) {
-            column.arrange(x, visibleRange, this.userResize);
+            if (arrangeRange === null || Range.overlaps(arrangeRange, column)) {
+                column.arrange(x, visibleRange, this.userResize);
+            }
             x += column.getWidth() + this.config.gapsInnerHorizontal;
         }
 

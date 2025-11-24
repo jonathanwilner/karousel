@@ -63,10 +63,12 @@ class World {
                 marginLeft: config.gapsOuterLeft,
                 marginRight: config.gapsOuterRight,
                 scroller: World.createScroller(config),
-                clamper: config.scrollingLazy ? new EdgeClamper() : new CenterClamper(),
+                clamper: World.createClamper(config),
                 gestureScroll: config.gestureScroll,
                 gestureScrollInvert: config.gestureScrollInvert,
                 gestureScrollStep: config.gestureScrollStep,
+                visibilityAwareArrange: config.visibilityAwareArrange,
+                arrangeVisibleBuffer: config.arrangeVisibleBuffer,
             },
             layoutConfig,
             focusPasser,
@@ -79,7 +81,9 @@ class World {
     }
 
     private static createScroller(config: Config) {
-        if (config.scrollingLazy) {
+        if (config.scrollingEndless) {
+            return new EndlessScroller();
+        } else if (config.scrollingLazy) {
             return new LazyScroller();
         } else if (config.scrollingCentered) {
             return new CenteredScroller();
@@ -89,6 +93,13 @@ class World {
             log("No scrolling mode selected, using default");
             return new LazyScroller();
         }
+    }
+
+    private static createClamper(config: Config) {
+        if (config.scrollingEndless) {
+            return new EndlessClamper();
+        }
+        return config.scrollingLazy ? new EdgeClamper() : new CenterClamper();
     }
 
     private addExistingClients() {

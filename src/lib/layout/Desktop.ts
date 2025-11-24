@@ -151,7 +151,11 @@ class Desktop {
         if (!this.dirty) {
             return;
         }
-        this.grid.arrange(this.tilingArea.x - this.scrollX, this.getCurrentVisibleRange());
+        const visibleRange = this.getCurrentVisibleRange();
+        const arrangeRange = this.config.visibilityAwareArrange ?
+            Range.expand(visibleRange, this.config.arrangeVisibleBuffer) :
+            null;
+        this.grid.arrange(this.tilingArea.x - this.scrollX, visibleRange, arrangeRange);
         this.dirty = false;
     }
 
@@ -186,6 +190,8 @@ namespace Desktop {
         gestureScrollStep: number;
         scroller: Desktop.Scroller;
         clamper: Desktop.Clamper;
+        visibilityAwareArrange: boolean;
+        arrangeVisibleBuffer: number;
     }
 
     export class ColumnRange {
