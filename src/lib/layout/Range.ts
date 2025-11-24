@@ -9,6 +9,10 @@ namespace Range {
         return new Basic(x, width);
     }
 
+    export function expand(range: Range, padding: number) {
+        return new Basic(range.getLeft() - padding, range.getWidth() + 2 * padding);
+    }
+
     export function fromRanges(leftRange: Range, rightRange: Range) {
         const left = leftRange.getLeft();
         const right = rightRange.getRight();
@@ -24,6 +28,10 @@ namespace Range {
         const aCenter = a.getLeft() + a.getWidth() / 2;
         const bCenter = b.getLeft() + b.getWidth() / 2;
         return Math.round(aCenter - bCenter);
+    }
+
+    export function overlaps(a: Range, b: Range) {
+        return a.getLeft() < b.getRight() && a.getRight() > b.getLeft();
     }
 
     class Basic {

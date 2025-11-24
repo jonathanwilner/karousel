@@ -7,6 +7,9 @@ https://github.com/peterfajdiga/karousel/assets/22796326/2ab62d18-09c7-45f9-8fda
 A scrollable tiling window manager tiles windows, but it does not maximize their widths. Instead, it leaves the width of windows to the user's control.
 Windows are automatically centered when possible. And when running out of width, windows can be scrolled through horizontally.
 
+- By default Karousel only arranges windows that overlap the current viewport plus a small buffer, keeping off-screen windows untouched until they become visible again.
+- An optional endless scrolling mode adds virtual padding at the edges so you can overscroll in either direction without immediately hitting the grid boundaries.
+
 Similar window managers include [PaperWM](https://github.com/paperwm/PaperWM),
 [Niri](https://github.com/YaLTeR/niri), and
 [Cardboard](https://gitlab.com/cardboardwm/cardboard).
