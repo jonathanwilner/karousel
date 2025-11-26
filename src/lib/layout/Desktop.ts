@@ -159,6 +159,33 @@ class Desktop {
         this.dirty = false;
     }
 
+    public restartTiling() {
+        const focusedWindow = this.grid.getLastFocusedWindow();
+        const windows: Window[] = [];
+        for (const column of this.grid.getColumns()) {
+            for (const window of column.getWindows()) {
+                windows.push(window);
+            }
+        }
+
+        if (windows.length === 0) {
+            return;
+        }
+
+        let lastColumn: Column|null = null;
+        for (const window of windows) {
+            const targetColumn: Column = new Column(this.grid, lastColumn);
+            window.moveToColumn(targetColumn, true, FocusPassing.Type.None);
+            lastColumn = targetColumn;
+        }
+
+        (focusedWindow ?? windows[0]).focus();
+        const columnToCenter = this.grid.getLastFocusedColumn() ?? this.grid.getFirstColumn();
+        if (columnToCenter !== null) {
+            this.scrollToColumn(columnToCenter, false);
+        }
+    }
+
     public forceArrange() {
         this.dirty = true;
     }

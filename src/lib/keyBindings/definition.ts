@@ -46,6 +46,20 @@ function getKeyBindings(world: World, actions: Actions): KeyBinding[] {
             action: () => world.doIfTiledFocused(actions.focusPrevious),
         },
         {
+            name: "overview-focus-next",
+            description: "Alt-Tab style overview: focus next and center",
+            comment: "Shows an overview-like centered focus as you cycle",
+            defaultKeySequence: "Alt+Tab",
+            action: () => world.doIfTiledFocused(actions.overviewFocusNext),
+        },
+        {
+            name: "overview-focus-previous",
+            description: "Alt-Tab style overview: focus previous and center",
+            comment: "Shows an overview-like centered focus as you cycle",
+            defaultKeySequence: "Alt+Shift+Tab",
+            action: () => world.doIfTiledFocused(actions.overviewFocusPrevious),
+        },
+        {
             name: "focus-start",
             description: "Move focus to start",
             defaultKeySequence: "Meta+Home",
@@ -229,6 +243,12 @@ function getKeyBindings(world: World, actions: Actions): KeyBinding[] {
             description: "Move Karousel grid to the current screen",
             defaultKeySequence: "Meta+Ctrl+Return",
             action: () => world.do(actions.screenSwitch),
+        },
+        {
+            name: "restart-tiling",
+            description: "Rebuild tiling from scratch",
+            defaultKeySequence: "Meta+Shift+T",
+            action: () => world.do(actions.restartTiling),
         },
     ];
 }

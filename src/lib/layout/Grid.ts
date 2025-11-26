@@ -75,6 +75,10 @@ class Grid {
         return this.columns.getLast();
     }
 
+    public *getColumns() {
+        yield* this.columns.iterator();
+    }
+
     public getColumnAtIndex(i: number) {
         return this.columns.getItemAtIndex(i);
     }

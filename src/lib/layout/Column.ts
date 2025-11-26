@@ -64,6 +64,10 @@ class Column {
         return this.windows.getLast()!;
     }
 
+    public *getWindows() {
+        yield* this.windows.iterator();
+    }
+
     public getAboveWindow(window: Window) {
         return this.windows.getPrev(window);
     }

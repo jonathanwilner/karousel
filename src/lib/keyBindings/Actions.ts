@@ -3,6 +3,31 @@ class Actions {
         private readonly config: Actions.Config,
     ) {}
 
+    private focusWithOverview(targetWindow: Window) {
+        targetWindow.focus();
+        targetWindow.column.grid.desktop.scrollCenterRange(targetWindow.column);
+    }
+
+    private getNextCarouselWindow(window: Window, column: Column, grid: Grid) {
+        const belowWindow = column.getBelowWindow(window);
+        if (belowWindow !== null) {
+            return belowWindow;
+        }
+
+        const nextColumn = grid.getRightColumn(column) ?? grid.getFirstColumn();
+        return nextColumn?.getFirstWindow() ?? null;
+    }
+
+    private getPreviousCarouselWindow(window: Window, column: Column, grid: Grid) {
+        const aboveWindow = column.getAboveWindow(window);
+        if (aboveWindow !== null) {
+            return aboveWindow;
+        }
+
+        const previousColumn = grid.getLeftColumn(column) ?? grid.getLastColumn();
+        return previousColumn?.getLastWindow() ?? null;
+    }
+
     public readonly focusLeft = (cm: ClientManager, dm: DesktopManager, window: Window, column: Column, grid: Grid) => {
         const leftColumn = grid.getLeftColumn(column);
         if (leftColumn === null) {
@@ -59,6 +84,30 @@ class Actions {
             }
             leftColumn.getLastWindow().focus();
         }
+    };
+
+    public readonly overviewFocusNext = (cm: ClientManager, dm: DesktopManager, window: Window, column: Column, grid: Grid) => {
+        const targetWindow = this.getNextCarouselWindow(window, column, grid);
+        if (targetWindow === null) {
+            return;
+        }
+
+        this.focusWithOverview(targetWindow);
+    };
+
+    public readonly overviewFocusPrevious = (
+        cm: ClientManager,
+        dm: DesktopManager,
+        window: Window,
+        column: Column,
+        grid: Grid,
+    ) => {
+        const targetWindow = this.getPreviousCarouselWindow(window, column, grid);
+        if (targetWindow === null) {
+            return;
+        }
+
+        this.focusWithOverview(targetWindow);
     };
 
     public readonly focusStart = (cm: ClientManager, dm: DesktopManager) => {
@@ -359,6 +408,10 @@ class Actions {
 
     public readonly screenSwitch = (cm: ClientManager, dm: DesktopManager) => {
         dm.selectScreen(Workspace.activeScreen);
+    };
+
+    public readonly restartTiling = (cm: ClientManager, dm: DesktopManager) => {
+        dm.getCurrentDesktop().restartTiling();
     };
 
     public readonly focus = (columnIndex: number, cm: ClientManager, dm: DesktopManager) => {
