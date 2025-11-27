@@ -25,7 +25,8 @@ ifeq (${CHECKS}, true)
 endif
 
 install: build
-	kpackagetool6 --type=KWin/Script --install=./package || kpackagetool6 --type=KWin/Script --upgrade=./package
+	# Prefer upgrade, but fall back to removing an existing install before installing fresh
+	kpackagetool6 --type=KWin/Script --upgrade=./package || (kpackagetool6 --type=KWin/Script --remove=karousel && kpackagetool6 --type=KWin/Script --install=./package)
 
 uninstall:
 	kpackagetool6 --type=KWin/Script --remove=karousel
