@@ -9,8 +9,6 @@ Windows are automatically centered when possible. And when running out of width,
 
 - By default Karousel only arranges windows that overlap the current viewport plus a small buffer, keeping off-screen windows untouched until they become visible again.
 - An optional endless scrolling mode adds virtual padding at the edges so you can overscroll in either direction without immediately hitting the grid boundaries.
-- Alt+Tab cycling now drives an overview-like focus change that recenters the selected window as you step through the carousel.
-- A restart shortcut (Meta+Shift+T) rebuilds the tiling layout if it ever drifts out of sync.
 
 Similar window managers include [PaperWM](https://github.com/paperwm/PaperWM),
 [Niri](https://github.com/YaLTeR/niri), and
