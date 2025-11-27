@@ -108,3 +108,12 @@ interface ShortcutHandler extends QmlObject {
     readonly activated: QSignal<[]>;
     destroy(): void;
 }
+
+declare function registerShortcut(
+    name: string,
+    text: string,
+    sequence: string,
+    handler: () => void,
+): void;
+
+declare function unregisterShortcut(name: string): void;

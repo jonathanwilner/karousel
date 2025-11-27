@@ -155,6 +155,12 @@ const configDef = [
         default: false,
     },
     {
+        name: "scrollingEndless",
+        type: "Bool",
+        default: false,
+        comment: "Allow overscrolling past the left/right edges and extend the scrollable range with padding.",
+    },
+    {
         name: "gestureScroll",
         type: "Bool",
         default: false,
@@ -188,5 +194,17 @@ const configDef = [
         name: "windowRules",
         type: "String",
         default: defaultWindowRules,
+    },
+    {
+        name: "visibilityAwareArrange",
+        type: "Bool",
+        default: true,
+        comment: "Only arrange windows that overlap the visible area plus a small buffer.",
+    },
+    {
+        name: "arrangeVisibleBuffer",
+        type: "UInt",
+        default: 200,
+        comment: "Horizontal buffer in pixels around the viewport used when arranging visible windows.",
     },
 ];

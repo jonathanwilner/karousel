@@ -1,19 +1,39 @@
 class ShortcutAction {
-    private readonly shortcutHandler: ShortcutHandler;
+    private readonly name: string;
+    private readonly shortcutHandler: ShortcutHandler|null;
 
     constructor(keyBinding: ShortcutAction.KeyBinding, f: () => void) {
-        this.shortcutHandler = ShortcutAction.initShortcutHandler(keyBinding);
-        this.shortcutHandler.activated.connect(f);
+        this.name = `karousel-${keyBinding.name}`;
+
+        if (typeof registerShortcut === "function" && typeof unregisterShortcut === "function") {
+            ShortcutAction.unregister(this.name);
+
+            // Use KWin's native global shortcut helpers so bindings appear in KDE settings.
+            registerShortcut(
+                this.name,
+                `Karousel: ${keyBinding.description}`,
+                keyBinding.defaultKeySequence ?? "",
+                f,
+            );
+            this.shortcutHandler = null;
+        } else {
+            this.shortcutHandler = ShortcutAction.initShortcutHandler(keyBinding);
+            this.shortcutHandler.activated.connect(f);
+        }
     }
 
     public destroy() {
-        this.shortcutHandler.destroy();
+        if (this.shortcutHandler !== null) {
+            this.shortcutHandler.destroy();
+            return;
+        }
+
+        ShortcutAction.unregister(this.name);
     }
 
     private static initShortcutHandler(keyBinding: ShortcutAction.KeyBinding) {
         const sequenceLine = keyBinding.defaultKeySequence !== undefined ?
-            `    sequence: "${keyBinding.defaultKeySequence}";
-` :
+            `    sequence: "${keyBinding.defaultKeySequence}";` :
             "";
 
         return Qt.createQmlObject(
@@ -25,6 +45,18 @@ ShortcutHandler {
 ${sequenceLine}}`,
             qmlBase,
         ) as ShortcutHandler;
+    }
+
+    private static unregister(name: string) {
+        if (typeof unregisterShortcut !== "function") {
+            return;
+        }
+
+        try {
+            unregisterShortcut(name);
+        } catch (error: any) {
+            log(error);
+        }
     }
 }
 
