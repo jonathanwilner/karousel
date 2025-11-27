@@ -19,10 +19,13 @@ interface Config {
     scrollingLazy: boolean;
     scrollingCentered: boolean;
     scrollingGrouped: boolean;
+    scrollingEndless: boolean;
     gestureScroll: boolean;
     gestureScrollInvert: boolean;
     gestureScrollStep: number;
     tiledKeepBelow: boolean;
     floatingKeepAbove: boolean;
     windowRules: string;
+    visibilityAwareArrange: boolean;
+    arrangeVisibleBuffer: number;
 }

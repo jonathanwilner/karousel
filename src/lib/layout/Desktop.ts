@@ -151,8 +151,39 @@ class Desktop {
         if (!this.dirty) {
             return;
         }
-        this.grid.arrange(this.tilingArea.x - this.scrollX, this.getCurrentVisibleRange());
+        const visibleRange = this.getCurrentVisibleRange();
+        const arrangeRange = this.config.visibilityAwareArrange ?
+            Range.expand(visibleRange, this.config.arrangeVisibleBuffer) :
+            null;
+        this.grid.arrange(this.tilingArea.x - this.scrollX, visibleRange, arrangeRange);
         this.dirty = false;
+    }
+
+    public restartTiling() {
+        const focusedWindow = this.grid.getLastFocusedWindow();
+        const windows: Window[] = [];
+        for (const column of this.grid.getColumns()) {
+            for (const window of column.getWindows()) {
+                windows.push(window);
+            }
+        }
+
+        if (windows.length === 0) {
+            return;
+        }
+
+        let lastColumn: Column|null = null;
+        for (const window of windows) {
+            const targetColumn: Column = new Column(this.grid, lastColumn);
+            window.moveToColumn(targetColumn, true, FocusPassing.Type.None);
+            lastColumn = targetColumn;
+        }
+
+        (focusedWindow ?? windows[0]).focus();
+        const columnToCenter = this.grid.getLastFocusedColumn() ?? this.grid.getFirstColumn();
+        if (columnToCenter !== null) {
+            this.scrollToColumn(columnToCenter, false);
+        }
     }
 
     public forceArrange() {
@@ -186,6 +217,8 @@ namespace Desktop {
         gestureScrollStep: number;
         scroller: Desktop.Scroller;
         clamper: Desktop.Clamper;
+        visibilityAwareArrange: boolean;
+        arrangeVisibleBuffer: number;
     }
 
     export class ColumnRange {
